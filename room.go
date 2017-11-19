@@ -3,20 +3,20 @@ package main
 type Roomer interface {
 	NameStr() string
 	Count() int
-	Message([]byte) error
-	Enter(Clienter) error
-	Exit(Clienter) error
+	Message([]byte, *Client) error
+	Enter(*Client) error
+	Exit(*Client) error
 }
 
 type Room struct {
 	Name    string
-	clients []Client
+	clients []*Client
 }
 
 func NewRoom(name string) Roomer {
 	return &Room{
 		Name:    name,
-		clients: []Client{},
+		clients: []*Client{},
 	}
 }
 
@@ -28,9 +28,12 @@ func (r *Room) Count() int {
 	return len(r.clients)
 }
 
-func (r *Room) Message(b []byte) error {
+func (r *Room) Message(b []byte, sender *Client) error {
 	for _, c := range r.clients {
-		err := c.Send(b)
+		if sender.HandleName == c.HandleName {
+			continue
+		}
+		err := c.Send(b, sender)
 		if err != nil {
 			return err
 		}
@@ -38,10 +41,11 @@ func (r *Room) Message(b []byte) error {
 	return nil
 }
 
-func (r *Room) Enter(c Clienter) error {
+func (r *Room) Enter(c *Client) error {
+	r.clients = append(r.clients, c)
 	return nil
 }
 
-func (r *Room) Exit(c Clienter) error {
+func (r *Room) Exit(c *Client) error {
 	return nil
 }

@@ -18,39 +18,34 @@ var upgrader = websocket.Upgrader{
 var hub Hub = Hub{}
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return
-	}
-
 	roomParam := r.URL.Query().Get("room")
 	name := r.URL.Query().Get("name")
 
 	if roomParam == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("necessary 'room' parameter"))
+		log.Println("necessary 'room' parameter")
 		return
 	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println(hub)
 	room := hub.ExtractRoom(roomParam)
 	if name == "" {
 		name = fmt.Sprintf("hoge%d", room.Count()+1)
 	}
+	log.Printf("room: %s", room.NameStr())
+	log.Printf("name: %s", name)
 
-	client := NewClient(name)
+	client := NewClient(name, conn, room)
 	room.Enter(client)
 
-	for {
-		mtype, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		log.Printf("%d: %s", mtype, string(p))
-		if err := conn.WriteMessage(mtype, p); err != nil {
-			log.Println(err)
-			return
-		}
-	}
+	go client.Socket()
 }
 
 func run() error {
