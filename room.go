@@ -14,19 +14,19 @@ type Roomer interface {
 }
 
 type Room struct {
-	Name    string
+	name    string
 	members []*MemberImpl
 }
 
 func NewRoom(name string) Roomer {
 	return &Room{
-		Name:    name,
+		name:    name,
 		members: []*MemberImpl{},
 	}
 }
 
 func (r *Room) NameStr() string {
-	return r.Name
+	return r.name
 }
 
 func (r *Room) Count() int {
@@ -34,17 +34,17 @@ func (r *Room) Count() int {
 }
 
 func (r *Room) Message(b []byte, sender Member) error {
-	m := fmt.Sprintf("%s: %s \n %s",
+	mes := fmt.Sprintf("%s: %s \n %s",
 		r.NameStr(),
 		sender.Name(),
 		string(b),
 	)
 
-	for _, c := range r.members {
-		if sender.Name() == c.HandleName {
+	for _, m := range r.members {
+		if sender.Name() == m.Name() {
 			continue
 		}
-		err := c.Send(m)
+		err := m.Send(mes)
 		if err != nil {
 			return err
 		}
@@ -54,6 +54,7 @@ func (r *Room) Message(b []byte, sender Member) error {
 
 func (r *Room) Enter(m *MemberImpl) error {
 	r.members = append(r.members, m)
+	log.Printf("%s entered to %s", m.Name(), r.name)
 	return nil
 }
 
@@ -67,6 +68,6 @@ func (r *Room) Exit(m *MemberImpl) error {
 	}
 	r.members = append(r.members[:index], r.members[index+1:]...)
 
-	log.Printf("%s is exited from %s", m.Name(), r.NameStr())
+	log.Printf("%s exited from %s", m.Name(), r.name)
 	return nil
 }

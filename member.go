@@ -14,26 +14,26 @@ type Member interface {
 }
 
 type MemberImpl struct {
-	HandleName string
-	Conn       *websocket.Conn
-	Room       Roomer
+	handleName string
+	conn       *websocket.Conn
+	room       Roomer
 }
 
 func NewMember(name string, conn *websocket.Conn, room Roomer) *MemberImpl {
 	return &MemberImpl{
-		HandleName: name,
-		Conn:       conn,
-		Room:       room,
+		handleName: name,
+		conn:       conn,
+		room:       room,
 	}
 }
 
 func (m *MemberImpl) Name() string {
-	return m.HandleName
+	return m.handleName
 }
 
 func (m *MemberImpl) Send(mes string) error {
 	// mtype?
-	err := m.Conn.WriteMessage(1, []byte(mes))
+	err := m.conn.WriteMessage(1, []byte(mes))
 	if err != nil {
 		return err
 	}
@@ -42,24 +42,23 @@ func (m *MemberImpl) Send(mes string) error {
 
 func (m *MemberImpl) Socket() {
 	defer func() {
-		m.Room.Exit(m)
+		m.room.Exit(m)
 	}()
 
 	for {
-		mtype, p, err := m.Conn.ReadMessage()
+		mtype, p, err := m.conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		log.Printf("%d: %s", mtype, string(p))
 		response := fmt.Sprintf("%s:%s \n %s",
-			m.Room.NameStr(),
-			m.HandleName,
+			m.room.NameStr(),
+			m.handleName,
 			string(p),
 		)
-		m.Room.Message(p, m)
+		m.room.Message(p, m)
 
-		if err := m.Conn.WriteMessage(mtype, []byte(response)); err != nil {
+		if err := m.conn.WriteMessage(mtype, []byte(response)); err != nil {
 			log.Println(err)
 			return
 		}

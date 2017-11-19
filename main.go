@@ -34,13 +34,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(hub)
 	room := hub.ExtractRoom(roomParam)
 	if name == "" {
 		name = fmt.Sprintf("hoge%d", room.Count()+1)
 	}
-	log.Printf("room: %s", room.NameStr())
-	log.Printf("name: %s", name)
 
 	member := NewMember(name, conn, room)
 	room.Enter(member)
@@ -49,7 +46,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func run() error {
-	http.HandleFunc("/wc", handler)
+	http.HandleFunc("/chat", handler)
 	return http.ListenAndServe(*addr, nil)
 }
 
