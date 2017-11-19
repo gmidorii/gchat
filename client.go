@@ -8,7 +8,8 @@ import (
 )
 
 type Clienter interface {
-	Send([]byte, *Client) error
+	Name() string
+	Send(m string) error
 	Socket()
 }
 
@@ -26,14 +27,13 @@ func NewClient(name string, conn *websocket.Conn, room Roomer) *Client {
 	}
 }
 
-func (c *Client) Send(b []byte, sender *Client) error {
-	response := fmt.Sprintf("%s: %s \n %s",
-		c.Room.NameStr(),
-		sender.HandleName,
-		string(b),
-	)
+func (c *Client) Name() string {
+	return c.HandleName
+}
+
+func (c *Client) Send(m string) error {
 	// mtype?
-	err := c.Conn.WriteMessage(1, []byte(response))
+	err := c.Conn.WriteMessage(1, []byte(m))
 	if err != nil {
 		return err
 	}

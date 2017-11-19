@@ -1,9 +1,11 @@
 package main
 
+import "fmt"
+
 type Roomer interface {
 	NameStr() string
 	Count() int
-	Message([]byte, *Client) error
+	Message([]byte, Clienter) error
 	Enter(*Client) error
 	Exit(*Client) error
 }
@@ -28,12 +30,18 @@ func (r *Room) Count() int {
 	return len(r.clients)
 }
 
-func (r *Room) Message(b []byte, sender *Client) error {
+func (r *Room) Message(b []byte, sender Clienter) error {
+	m := fmt.Sprintf("%s: %s \n %s",
+		r.NameStr(),
+		sender.Name(),
+		string(b),
+	)
+
 	for _, c := range r.clients {
-		if sender.HandleName == c.HandleName {
+		if sender.Name() == c.HandleName {
 			continue
 		}
-		err := c.Send(b, sender)
+		err := c.Send(m)
 		if err != nil {
 			return err
 		}
