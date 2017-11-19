@@ -42,10 +42,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("room: %s", room.NameStr())
 	log.Printf("name: %s", name)
 
-	client := NewClient(name, conn, room)
-	room.Enter(client)
+	member := NewMember(name, conn, room)
+	room.Enter(member)
 
-	go client.Socket()
+	go member.Socket()
 }
 
 func run() error {

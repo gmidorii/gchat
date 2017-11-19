@@ -1,24 +1,27 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Roomer interface {
 	NameStr() string
 	Count() int
-	Message([]byte, Clienter) error
-	Enter(*Client) error
-	Exit(*Client) error
+	Message([]byte, Member) error
+	Enter(*MemberImpl) error
+	Exit(*MemberImpl) error
 }
 
 type Room struct {
 	Name    string
-	clients []*Client
+	members []*MemberImpl
 }
 
 func NewRoom(name string) Roomer {
 	return &Room{
 		Name:    name,
-		clients: []*Client{},
+		members: []*MemberImpl{},
 	}
 }
 
@@ -27,17 +30,17 @@ func (r *Room) NameStr() string {
 }
 
 func (r *Room) Count() int {
-	return len(r.clients)
+	return len(r.members)
 }
 
-func (r *Room) Message(b []byte, sender Clienter) error {
+func (r *Room) Message(b []byte, sender Member) error {
 	m := fmt.Sprintf("%s: %s \n %s",
 		r.NameStr(),
 		sender.Name(),
 		string(b),
 	)
 
-	for _, c := range r.clients {
+	for _, c := range r.members {
 		if sender.Name() == c.HandleName {
 			continue
 		}
@@ -49,19 +52,21 @@ func (r *Room) Message(b []byte, sender Clienter) error {
 	return nil
 }
 
-func (r *Room) Enter(c *Client) error {
-	r.clients = append(r.clients, c)
+func (r *Room) Enter(m *MemberImpl) error {
+	r.members = append(r.members, m)
 	return nil
 }
 
-func (r *Room) Exit(c *Client) error {
+func (r *Room) Exit(m *MemberImpl) error {
 	var index int
-	for i, client := range r.clients {
-		if c.Name() == client.Name() {
+	for i, member := range r.members {
+		if m.Name() == member.Name() {
 			index = i
 			break
 		}
 	}
-	r.clients = append(r.clients[:index], r.clients[index+1:]...)
+	r.members = append(r.members[:index], r.members[index+1:]...)
+
+	log.Printf("%s is exited from %s", m.Name(), r.NameStr())
 	return nil
 }

@@ -7,59 +7,59 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Clienter interface {
+type Member interface {
 	Name() string
 	Send(m string) error
 	Socket()
 }
 
-type Client struct {
+type MemberImpl struct {
 	HandleName string
 	Conn       *websocket.Conn
 	Room       Roomer
 }
 
-func NewClient(name string, conn *websocket.Conn, room Roomer) *Client {
-	return &Client{
+func NewMember(name string, conn *websocket.Conn, room Roomer) *MemberImpl {
+	return &MemberImpl{
 		HandleName: name,
 		Conn:       conn,
 		Room:       room,
 	}
 }
 
-func (c *Client) Name() string {
-	return c.HandleName
+func (m *MemberImpl) Name() string {
+	return m.HandleName
 }
 
-func (c *Client) Send(m string) error {
+func (m *MemberImpl) Send(mes string) error {
 	// mtype?
-	err := c.Conn.WriteMessage(1, []byte(m))
+	err := m.Conn.WriteMessage(1, []byte(mes))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *Client) Socket() {
+func (m *MemberImpl) Socket() {
 	defer func() {
-		c.Room.Exit(c)
+		m.Room.Exit(m)
 	}()
 
 	for {
-		mtype, p, err := c.Conn.ReadMessage()
+		mtype, p, err := m.Conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
 		log.Printf("%d: %s", mtype, string(p))
 		response := fmt.Sprintf("%s:%s \n %s",
-			c.Room.NameStr(),
-			c.HandleName,
+			m.Room.NameStr(),
+			m.HandleName,
 			string(p),
 		)
-		c.Room.Message(p, c)
+		m.Room.Message(p, m)
 
-		if err := c.Conn.WriteMessage(mtype, []byte(response)); err != nil {
+		if err := m.Conn.WriteMessage(mtype, []byte(response)); err != nil {
 			log.Println(err)
 			return
 		}
