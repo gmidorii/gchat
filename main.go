@@ -34,7 +34,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room := hub.ExtractRoom(roomParam)
+	room, err := hub.ExtractRoom(roomParam)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	if name == "" {
 		name = fmt.Sprintf("hoge%d", room.Count()+1)
 	}

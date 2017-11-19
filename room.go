@@ -16,12 +16,14 @@ type Roomer interface {
 type Room struct {
 	name    string
 	members []*MemberImpl
+	history Historier
 }
 
-func NewRoom(name string) Roomer {
+func NewRoom(name string, history Historier) Roomer {
 	return &Room{
 		name:    name,
 		members: []*MemberImpl{},
+		history: history,
 	}
 }
 
@@ -49,7 +51,8 @@ func (r *Room) Message(b []byte, sender Member) error {
 			return err
 		}
 	}
-	return nil
+	// write log
+	return r.history.Write(r.name, sender.Name(), string(b))
 }
 
 func (r *Room) Enter(m *MemberImpl) error {
@@ -67,7 +70,19 @@ func (r *Room) Exit(m *MemberImpl) error {
 		}
 	}
 	r.members = append(r.members[:index], r.members[index+1:]...)
-
 	log.Printf("%s exited from %s", m.Name(), r.name)
+
+	if len(r.members) == 0 {
+		return r.close()
+	}
+	return nil
+}
+
+func (r *Room) close() error {
+	err := r.history.Close()
+	if err != nil {
+		return err
+	}
+	hub.Close(r)
 	return nil
 }
