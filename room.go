@@ -55,5 +55,13 @@ func (r *Room) Enter(c *Client) error {
 }
 
 func (r *Room) Exit(c *Client) error {
+	var index int
+	for i, client := range r.clients {
+		if c.Name() == client.Name() {
+			index = i
+			break
+		}
+	}
+	r.clients = append(r.clients[:index], r.clients[index+1:]...)
 	return nil
 }

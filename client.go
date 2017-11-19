@@ -41,6 +41,10 @@ func (c *Client) Send(m string) error {
 }
 
 func (c *Client) Socket() {
+	defer func() {
+		c.Room.Exit(c)
+	}()
+
 	for {
 		mtype, p, err := c.Conn.ReadMessage()
 		if err != nil {
