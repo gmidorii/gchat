@@ -9,6 +9,8 @@ func TestExtractRoom(t *testing.T) {
 		want  Roomer
 	}{
 		{[]Roomer{}, "hoge", &Room{name: "hoge"}},
+		{[]Roomer{&Room{name: "hoge"}}, "hoge", &Room{name: "hoge"}},
+		{[]Roomer{&Room{name: "hoge"}}, "new", &Room{name: "new"}},
 	}
 
 	for _, c := range cases {
