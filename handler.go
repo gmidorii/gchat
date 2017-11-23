@@ -13,7 +13,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var hub Hub = Hub{}
+var hub *Hub
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	roomParam := r.URL.Query().Get("room")

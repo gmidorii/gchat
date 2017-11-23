@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"github.com/pkg/errors"
 )
 
 type Roomer interface {
@@ -19,12 +21,16 @@ type Room struct {
 	history Historier
 }
 
-func NewRoom(name string, history Historier) Roomer {
+func NewRoom(name string, root string) (Roomer, error) {
+	history, err := NewHistory(root, name)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed create log file")
+	}
 	return &Room{
 		name:    name,
 		members: []*MemberImpl{},
 		history: history,
-	}
+	}, nil
 }
 
 func (r *Room) NameStr() string {

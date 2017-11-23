@@ -2,19 +2,29 @@ package main
 
 import (
 	"log"
-	"os"
-	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 type Hub struct {
-	Rooms []Roomer
+	Rooms       []Roomer
+	historyRoot string
+}
+
+func NewHub(root string) *Hub {
+	return &Hub{
+		historyRoot: root,
+	}
 }
 
 func (h *Hub) ExtractRoom(name string) (Roomer, error) {
 	if len(h.Rooms) == 0 {
-		return createNewRoom(h, name)
+		room, err := NewRoom(name, h.historyRoot)
+		if err != nil {
+			return nil, err
+		}
+		h.Rooms = append(h.Rooms, room)
+		log.Printf("Create New Room: %s\n", name)
+
+		return room, nil
 	}
 
 	for _, r := range h.Rooms {
@@ -23,7 +33,14 @@ func (h *Hub) ExtractRoom(name string) (Roomer, error) {
 		}
 	}
 
-	return createNewRoom(h, name)
+	room, err := NewRoom(name, h.historyRoot)
+	if err != nil {
+		return nil, err
+	}
+	h.Rooms = append(h.Rooms, room)
+	log.Printf("Create New Room: %s\n", name)
+
+	return room, nil
 }
 
 func (h *Hub) Close(r Roomer) {
@@ -36,19 +53,4 @@ func (h *Hub) Close(r Roomer) {
 	}
 	h.Rooms = append(h.Rooms[:index], h.Rooms[index+1:]...)
 	log.Printf("[%s] room is closed", r.NameStr())
-}
-
-func createNewRoom(h *Hub, name string) (Roomer, error) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed create log file")
-	}
-	history, err := NewHistory(filepath.Join(pwd, "history"), name)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed create log file")
-	}
-	room := NewRoom(name, history)
-	h.Rooms = append(h.Rooms, room)
-	log.Printf("Create New Room: %s\n", name)
-	return room, nil
 }
