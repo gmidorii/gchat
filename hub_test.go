@@ -37,6 +37,11 @@ func TestExtractRoom(t *testing.T) {
 		}
 
 		// tear down
+		_, err = os.Stat(filepath.Join(hub.historyRoot, r.NameStr()))
+		if os.IsNotExist(err) {
+			continue
+		}
+
 		err = os.Remove(filepath.Join(hub.historyRoot, r.NameStr()))
 		if err != nil {
 			t.Errorf("failed rm history file: %v", err)
