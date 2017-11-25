@@ -48,3 +48,49 @@ func TestExtractRoom(t *testing.T) {
 		}
 	}
 }
+
+func TestClose(t *testing.T) {
+	cases := []struct {
+		rooms []Roomer
+		in    *Room
+		want  int
+		isErr bool
+	}{
+		{[]Roomer{&Room{name: "hoge"}},
+			&Room{name: "hoge"},
+			0,
+			false,
+		},
+		{[]Roomer{},
+			&Room{name: "hoge"},
+			0,
+			true,
+		},
+		{[]Roomer{&Room{name: "hoge"}},
+			&Room{name: "fuga"},
+			1,
+			true,
+		},
+		{[]Roomer{&Room{name: "hoge"}, &Room{name: "hoge2"}},
+			&Room{name: "hoge"},
+			1,
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		hub := Hub{
+			Rooms: c.rooms,
+		}
+		err := hub.Close(c.in)
+
+		if len(hub.Rooms) != c.want {
+			t.Errorf("not expected room num\n e:%d\n a:%d", c.want, len(hub.Rooms))
+		}
+		if c.isErr {
+			if err == nil {
+				t.Errorf("not occur expected error")
+			}
+		}
+	}
+}

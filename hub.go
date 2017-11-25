@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+
+	"github.com/pkg/errors"
 )
 
 type Hub struct {
@@ -43,14 +45,18 @@ func (h *Hub) ExtractRoom(name string) (Roomer, error) {
 	return room, nil
 }
 
-func (h *Hub) Close(r Roomer) {
-	var index int
+func (h *Hub) Close(r Roomer) error {
+	idx := -1
 	for i, room := range h.Rooms {
 		if r.NameStr() == room.NameStr() {
-			index = i
+			idx = i
 			break
 		}
 	}
-	h.Rooms = append(h.Rooms[:index], h.Rooms[index+1:]...)
+	if idx == -1 {
+		return errors.Errorf("not exist room :%s", r.NameStr())
+	}
+	h.Rooms = append(h.Rooms[:idx], h.Rooms[idx+1:]...)
 	log.Printf("[%s] room is closed", r.NameStr())
+	return nil
 }
