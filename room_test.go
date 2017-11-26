@@ -96,3 +96,27 @@ func TestEnter(t *testing.T) {
 		t.Errorf("not expected member\n e:%s\n a:%s", "hoge", a.Name())
 	}
 }
+
+func TestExit(t *testing.T) {
+	room := Room{
+		name: "room",
+		members: []Member{
+			&MemberTestImpl{name: "hoge"},
+			&MemberTestImpl{name: "fuga"},
+		},
+		history: &HistoryTest{},
+	}
+
+	err := room.Exit(&MemberTestImpl{name: "hoge"})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(room.members) != 1 {
+		t.Errorf("not expected members num\n e:%d\n a:%d", 1, len(room.members))
+	}
+	a := room.members[0]
+	if a.Name() != "fuga" {
+		t.Errorf("not expected member\n e:%s\n a:%s", "fuga", a.Name())
+	}
+}
