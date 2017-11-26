@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -22,9 +23,27 @@ func (m *MemberTestImpl) Send(mes string) error {
 func (m *MemberTestImpl) Socket() {
 }
 
+type HistoryTest struct {
+	content string
+}
+
+func (h *HistoryTest) Write(room, member, message string) error {
+	h.content = fmt.Sprintf("%s:%s:%s", room, member, message)
+	return nil
+}
+
+func (h *HistoryTest) Close() error {
+	return nil
+}
+
 func TestMessage_Content(t *testing.T) {
+	// setup
 	exp := "room: sender \n content"
-	room, _ := NewRoom("room", "./")
+	room := Room{
+		name:    "room",
+		members: []Member{},
+		history: &HistoryTest{},
+	}
 	sender := &MemberTestImpl{
 		name: "sender",
 	}
@@ -34,13 +53,21 @@ func TestMessage_Content(t *testing.T) {
 	}
 	room.Enter(reciver)
 
-	if err := room.Message([]byte("content"), sender); err != nil {
+	// execute
+	err := room.Message([]byte("content"), sender)
+	if err != nil {
 		t.Errorf("failed Message func: %v", err)
 	}
 
+	// verify
 	if reciver.content != exp {
 		t.Errorf("not expected content\n e:%s\n a:%s\n", exp, reciver.content)
 	}
+	h, _ := room.history.(*HistoryTest)
+	if h.content != "room:sender:content" {
+		t.Errorf("not expected content\n a:%s\n", h.content)
+	}
 
+	// tear down
 	os.Remove("room")
 }
