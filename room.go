@@ -11,13 +11,13 @@ type Roomer interface {
 	NameStr() string
 	Count() int
 	Message([]byte, Member) error
-	Enter(*MemberImpl) error
-	Exit(*MemberImpl) error
+	Enter(Member) error
+	Exit(Member) error
 }
 
 type Room struct {
 	name    string
-	members []*MemberImpl
+	members []Member
 	history Historier
 }
 
@@ -28,7 +28,7 @@ func NewRoom(name string, root string) (Roomer, error) {
 	}
 	return &Room{
 		name:    name,
-		members: []*MemberImpl{},
+		members: []Member{},
 		history: history,
 	}, nil
 }
@@ -49,6 +49,7 @@ func (r *Room) Message(b []byte, sender Member) error {
 	)
 
 	for _, m := range r.members {
+		log.Println(m)
 		if sender.Name() == m.Name() {
 			continue
 		}
@@ -61,13 +62,13 @@ func (r *Room) Message(b []byte, sender Member) error {
 	return r.history.Write(r.name, sender.Name(), string(b))
 }
 
-func (r *Room) Enter(m *MemberImpl) error {
+func (r *Room) Enter(m Member) error {
 	r.members = append(r.members, m)
 	log.Printf("%s entered to %s", m.Name(), r.name)
 	return nil
 }
 
-func (r *Room) Exit(m *MemberImpl) error {
+func (r *Room) Exit(m Member) error {
 	var index int
 	for i, member := range r.members {
 		if m.Name() == member.Name() {

@@ -19,7 +19,7 @@ type MemberImpl struct {
 	room       Roomer
 }
 
-func NewMember(name string, conn *websocket.Conn, room Roomer) *MemberImpl {
+func NewMember(name string, conn *websocket.Conn, room Roomer) Member {
 	return &MemberImpl{
 		handleName: name,
 		conn:       conn,
