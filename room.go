@@ -8,7 +8,7 @@ import (
 )
 
 type Roomer interface {
-	NameStr() string
+	Name() string
 	Count() int
 	Message([]byte, Member) error
 	Enter(Member) error
@@ -33,7 +33,7 @@ func NewRoom(name string, root string) (Roomer, error) {
 	}, nil
 }
 
-func (r *Room) NameStr() string {
+func (r *Room) Name() string {
 	return r.name
 }
 
@@ -43,7 +43,7 @@ func (r *Room) Count() int {
 
 func (r *Room) Message(b []byte, sender Member) error {
 	mes := fmt.Sprintf("%s: %s \n %s",
-		r.NameStr(),
+		r.Name(),
 		sender.Name(),
 		string(b),
 	)

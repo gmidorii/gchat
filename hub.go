@@ -30,7 +30,7 @@ func (h *Hub) ExtractRoom(name string) (Roomer, error) {
 	}
 
 	for _, r := range h.Rooms {
-		if name == r.NameStr() {
+		if name == r.Name() {
 			return r, nil
 		}
 	}
@@ -48,15 +48,15 @@ func (h *Hub) ExtractRoom(name string) (Roomer, error) {
 func (h *Hub) Close(r Roomer) error {
 	idx := -1
 	for i, room := range h.Rooms {
-		if r.NameStr() == room.NameStr() {
+		if r.Name() == room.Name() {
 			idx = i
 			break
 		}
 	}
 	if idx == -1 {
-		return errors.Errorf("not exist room :%s", r.NameStr())
+		return errors.Errorf("not exist room :%s", r.Name())
 	}
 	h.Rooms = append(h.Rooms[:idx], h.Rooms[idx+1:]...)
-	log.Printf("[%s] room is closed", r.NameStr())
+	log.Printf("[%s] room is closed", r.Name())
 	return nil
 }

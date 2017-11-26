@@ -32,17 +32,17 @@ func TestExtractRoom(t *testing.T) {
 		if err != nil {
 			t.Errorf("failed extract: %v", err)
 		}
-		if c.want.NameStr() != r.NameStr() {
-			t.Errorf("not expected room\n e:%s \n a:%s", c.want.NameStr(), r.NameStr())
+		if c.want.Name() != r.Name() {
+			t.Errorf("not expected room\n e:%s \n a:%s", c.want.Name(), r.Name())
 		}
 
 		// tear down
-		_, err = os.Stat(filepath.Join(hub.historyRoot, r.NameStr()))
+		_, err = os.Stat(filepath.Join(hub.historyRoot, r.Name()))
 		if os.IsNotExist(err) {
 			continue
 		}
 
-		err = os.Remove(filepath.Join(hub.historyRoot, r.NameStr()))
+		err = os.Remove(filepath.Join(hub.historyRoot, r.Name()))
 		if err != nil {
 			t.Errorf("failed rm history file: %v", err)
 		}

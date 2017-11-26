@@ -52,7 +52,7 @@ func (m *MemberImpl) Socket() {
 			return
 		}
 		response := fmt.Sprintf("%s:%s \n %s",
-			m.room.NameStr(),
+			m.room.Name(),
 			m.handleName,
 			string(p),
 		)
