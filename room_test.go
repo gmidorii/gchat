@@ -71,3 +71,28 @@ func TestMessage_Content(t *testing.T) {
 	// tear down
 	os.Remove("room")
 }
+
+func TestEnter(t *testing.T) {
+	room := Room{
+		name:    "room",
+		members: []Member{},
+		history: &HistoryTest{},
+	}
+
+	m := &MemberTestImpl{
+		name: "hoge",
+	}
+
+	err := room.Enter(m)
+	if err != nil {
+		t.Errorf("err :%v", err)
+	}
+
+	if len(room.members) != 1 {
+		t.Errorf("not expected members num\n e:%d\n a:%d", 1, len(room.members))
+	}
+	a := room.members[0]
+	if a.Name() != "hoge" {
+		t.Errorf("not expected member\n e:%s\n a:%s", "hoge", a.Name())
+	}
+}
