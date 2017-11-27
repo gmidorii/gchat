@@ -120,3 +120,13 @@ func TestExit(t *testing.T) {
 		t.Errorf("not expected member\n e:%s\n a:%s", "fuga", a.Name())
 	}
 }
+
+func TestName(t *testing.T) {
+	room := Room{
+		name: "room",
+	}
+
+	if room.Name() != "room" {
+		t.Errorf("not expected name\n e:%s\n a:%s\n", "room", room.Name())
+	}
+}
