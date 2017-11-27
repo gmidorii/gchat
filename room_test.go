@@ -130,3 +130,16 @@ func TestName(t *testing.T) {
 		t.Errorf("not expected name\n e:%s\n a:%s\n", "room", room.Name())
 	}
 }
+
+func TestCount(t *testing.T) {
+	room := Room{
+		members: []Member{
+			&MemberTestImpl{name: "hoge"},
+			&MemberTestImpl{name: "fuga"},
+		},
+	}
+
+	if room.Count() != 2 {
+		t.Errorf("not expected count\n e:%d\n a:%d", 2, room.Count())
+	}
+}
