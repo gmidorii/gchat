@@ -121,7 +121,7 @@ func TestExit(t *testing.T) {
 	}
 }
 
-func TestName(t *testing.T) {
+func TestRoomName(t *testing.T) {
 	room := Room{
 		name: "room",
 	}
