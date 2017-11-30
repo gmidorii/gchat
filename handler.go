@@ -38,7 +38,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if name == "" {
-		name = fmt.Sprintf("hoge%d", room.Count()+1)
+		name = fmt.Sprintf("gchat-%d", room.Count()+1)
 	}
 
 	member := NewMember(name, conn, room)

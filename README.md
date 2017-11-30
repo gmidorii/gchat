@@ -25,6 +25,7 @@ Usage of ./gchat:
 
 ### Client Sample
 [wscat](https://github.com/websockets/wscat) use.
+ex) mac os
 ```
 brew install wscat
 ```
